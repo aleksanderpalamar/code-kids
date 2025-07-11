@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { ProcessedVideo } from "@/lib/youtube-api";
 import { useSearchParams } from "next/navigation";
+import { ProcessedVideo } from "@/types";
 
 export function Progress() {
   const [watchedVideos, setWatchedVideos] = useState<string[]>([]);
@@ -14,7 +14,7 @@ export function Progress() {
   const searchParams = useSearchParams();
   const videoId = searchParams.get("id");
   const youtubeId = searchParams.get("youtubeId");
-  const title = searchParams.get('title') || 'Vídeo Educativo'
+  const title = searchParams.get("title") || "Vídeo Educativo";
   const description =
     searchParams.get("description") ||
     "Aprenda programação com este vídeo incrível!";

@@ -1,5 +1,3 @@
-"use client";
-
 import { WatchProvider } from "@/components/videos/watch/watch-context";
 import { WatchContainer } from "@/components/videos/watch/watch-container";
 

@@ -5,11 +5,8 @@ import { Actions } from "@/components/actions";
 export function WatchSidebar() {
   return (
     <div className="space-y-6">
-      {/* Actions */}
       <Actions />
-      {/* Stats */}
       <Progress />
-      {/* Quick Navigation */}
       <QuickNavigation />
     </div>
   );
