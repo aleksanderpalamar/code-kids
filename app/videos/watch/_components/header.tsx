@@ -1,36 +1,27 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ProcessedVideo } from "@/lib/youtube-api";
+import { ProcessedVideo } from "@/types";
 import { ArrowLeft, Bookmark, Share2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useAppStore } from "@/stores/app-store";
 
 export function Header() {
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const searchParams = useSearchParams();
   const videoId = searchParams.get("id");
+  const { isVideoBookmarked, toggleBookmark } = useAppStore();
 
   const video = {
     id: videoId || "",
     publishedAt: "",
   } as ProcessedVideo;
 
+  const isBookmarked = videoId ? isVideoBookmarked(videoId) : false;
+
   const handleBookmark = () => {
     if (!videoId) return;
-
-    const bookmarks = localStorage.getItem("bookmarkedVideos");
-    let bookmarkedList = bookmarks ? JSON.parse(bookmarks) : [];
-
-    if (isBookmarked) {
-      bookmarkedList = bookmarkedList.filter((id: string) => id !== videoId);
-    } else {
-      bookmarkedList.push(videoId);
-    }
-
-    localStorage.setItem("bookmarkedVideos", JSON.stringify(bookmarkedList));
-    setIsBookmarked(!isBookmarked);
+    toggleBookmark(videoId);
   };
 
   const handleShare = () => {
@@ -53,7 +44,11 @@ export function Header() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 md:space-x-4">
             <Link href="/videos">
-              <Button variant="ghost" size="sm" className="text-purple-600 cursor-pointer transition-colors duration-300">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-purple-600 cursor-pointer transition-colors duration-300"
+              >
                 <ArrowLeft className="h-4 w-4 mr-1 md:mr-2" />
                 <span className="hidden sm:inline">Voltar</span>
               </Button>

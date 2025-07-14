@@ -1,15 +1,17 @@
-"use client"
+"use client";
 
 import { VideoCard } from "./video-card";
-import { ProcessedVideo } from "@/lib/youtube-api";
+import { ProcessedVideo } from "@/types";
+import { useAppStore } from "@/stores/app-store";
 
 interface VideoGridProps {
   videos: ProcessedVideo[];
-  watchedVideos: string[];
   onWatchAction: (videoId: string, youtubeId: string) => void;
 }
 
-export function VideoGrid({ videos, watchedVideos, onWatchAction }: VideoGridProps) {
+export function VideoGrid({ videos, onWatchAction }: VideoGridProps) {
+  const { watchedVideos } = useAppStore();
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
       {videos.map((video) => (

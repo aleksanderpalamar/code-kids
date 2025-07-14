@@ -7,9 +7,11 @@ import { WatchLoadingState } from "./watch-loading-state";
 import { VideoNotFoundState } from "./video-not-found-state";
 import { VideoInfo } from "./video-info";
 import { WatchSidebar } from "./watch-sidebar";
+import { useAppStore } from "@/stores/app-store";
 
 export function WatchContainer() {
-  const { video, watchedVideos, loading } = useWatchContext();
+  const { video, loading } = useWatchContext();
+  const { isVideoWatched } = useAppStore();
 
   if (loading) {
     return <WatchLoadingState />;
@@ -19,7 +21,7 @@ export function WatchContainer() {
     return <VideoNotFoundState />;
   }
 
-  const isWatched = watchedVideos.includes(video.id);
+  const isWatched = isVideoWatched(video.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100">

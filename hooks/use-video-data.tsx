@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
-import { useVideos } from "@/components/videos/videos-context";
+import { useAppStore } from "@/stores/app-store";
 import {
   searchBrazilianProgrammingVideos,
   searchProgrammingVideos,
@@ -12,11 +12,10 @@ export function useVideoData() {
     videos,
     setVideos,
     setFilteredVideos,
-    setWatchedVideos,
     setLoading,
     setSearchLoading,
     setError,
-  } = useVideos();
+  } = useAppStore();
 
   const loadInitialVideos = useCallback(async () => {
     try {

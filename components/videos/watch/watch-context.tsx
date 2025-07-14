@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProcessedVideo } from "@/types";
-import { useVideos } from "../videos-context";
+import { useAppStore } from "@/stores/app-store";
 
 interface WatchContextType {
   video: ProcessedVideo | null;
@@ -37,8 +37,12 @@ interface WatchProviderProps {
 
 export function WatchProvider({ children }: WatchProviderProps) {
   const searchParams = useSearchParams();
-  const { watchedVideos, markVideoAsWatched } = useVideos();
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const {
+    watchedVideos,
+    markVideoAsWatched,
+    isVideoBookmarked,
+    toggleBookmark,
+  } = useAppStore();
   const [loading, setLoading] = useState(true);
 
   const videoId = searchParams.get("id");
@@ -71,13 +75,17 @@ export function WatchProvider({ children }: WatchProviderProps) {
       }
     : null;
 
-  useEffect(() => {
-    const bookmarks = localStorage.getItem("bookmarkedVideos");
-    if (bookmarks && videoId) {
-      const bookmarkedList = JSON.parse(bookmarks);
-      setIsBookmarked(bookmarkedList.includes(videoId));
-    }
+  const isBookmarked = videoId ? isVideoBookmarked(videoId) : false;
 
+  const setIsBookmarked = (bookmarked: boolean) => {
+    if (videoId) {
+      if (bookmarked !== isBookmarked) {
+        toggleBookmark(videoId);
+      }
+    }
+  };
+
+  useEffect(() => {
     setLoading(false);
   }, [videoId]);
 

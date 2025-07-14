@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useVideos } from "./videos-context";
+import { useAppStore } from "@/stores/app-store";
 import { useVideoData } from "@/hooks/use-video-data";
 import { useVideoFilters } from "@/hooks/use-video-filters";
 import { useVideoActions } from "@/hooks/use-video-actions";
@@ -13,14 +13,8 @@ import { VideoGrid } from "./video-grid";
 import { VideoEmptyState } from "./video-empty-state";
 
 export function VideosContainer() {
-  const {
-    videos,
-    filteredVideos,
-    watchedVideos,
-    loading,
-    searchLoading,
-    error,
-  } = useVideos();
+  const { videos, filteredVideos, loading, searchLoading, error } =
+    useAppStore();
 
   const { loadInitialVideos } = useVideoData();
   const {
@@ -91,11 +85,7 @@ export function VideosContainer() {
           />
         ) : filteredVideos.length > 0 ? (
           // Mostrar grid de vídeos
-          <VideoGrid
-            videos={filteredVideos}
-            watchedVideos={watchedVideos}
-            onWatchAction={handleWatchVideo}
-          />
+          <VideoGrid videos={filteredVideos} onWatchAction={handleWatchVideo} />
         ) : (
           // Mostrar estado vazio
           !loading && <VideoEmptyState onReloadAction={loadInitialVideos} />

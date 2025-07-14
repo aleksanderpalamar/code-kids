@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useVideos } from "@/components/videos/videos-context";
+import { useAppStore } from "@/stores/app-store";
 
 export function useVideoActions() {
   const router = useRouter();
-  const { filteredVideos, markVideoAsWatched } = useVideos();
+  const { filteredVideos, markVideoAsWatched } = useAppStore();
 
   const handleWatchVideo = (videoId: string, youtubeId: string) => {
     // Get video data to pass via URL
@@ -28,7 +28,7 @@ export function useVideoActions() {
       router.push(`/videos/watch?${params.toString()}`);
     }
 
-    // Marcar o vídeo como assistido usando a nova função do contexto
+    // Marcar o vídeo como assistido usando o Zustand
     markVideoAsWatched(videoId);
   };
 

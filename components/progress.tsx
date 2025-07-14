@@ -1,28 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { useSearchParams } from "next/navigation";
-import { useVideos } from "./videos/videos-context";
+import { useAppStore } from "@/stores/app-store";
 
 export function Progress() {
-  const { watchedVideos } = useVideos();
-  const [isBookmarked, setIsBookmarked] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const searchParams = useSearchParams();
-  const videoId = searchParams.get("id");
-
-  useEffect(() => {
-    const bookmarks = localStorage.getItem("bookmarkedVideos");
-    if (bookmarks && videoId) {
-      const bookmarkedList = JSON.parse(bookmarks);
-      setIsBookmarked(bookmarkedList.includes(videoId));
-    }
-
-    setLoading(false);
-  }, [videoId]);
+  const { watchedVideos } = useAppStore();
 
   return (
     <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">

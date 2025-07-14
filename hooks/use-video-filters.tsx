@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
 import { useEffect } from "react";
-import { useVideos } from "@/components/videos/videos-context";
+import { useAppStore } from "@/stores/app-store";
 import { useVideoData } from "./use-video-data";
 
 export function useVideoFilters() {
@@ -14,8 +14,8 @@ export function useVideoFilters() {
     setSearchTerm,
     setSelectedLanguage,
     setSelectedDifficulty,
-  } = useVideos();
-  
+  } = useAppStore();
+
   const { handleSearch } = useVideoData();
 
   // Handle search with debounce
@@ -32,17 +32,27 @@ export function useVideoFilters() {
     let filtered = videos;
 
     if (selectedLanguage !== "all") {
-      filtered = filtered.filter((video) => video.language === selectedLanguage);
+      filtered = filtered.filter(
+        (video) => video.language === selectedLanguage
+      );
     }
 
     if (selectedDifficulty !== "all") {
-      filtered = filtered.filter((video) => video.difficulty === selectedDifficulty);
+      filtered = filtered.filter(
+        (video) => video.difficulty === selectedDifficulty
+      );
     }
 
     if (!searchTerm) {
       setFilteredVideos(filtered);
     }
-  }, [selectedLanguage, selectedDifficulty, videos, searchTerm, setFilteredVideos]);
+  }, [
+    selectedLanguage,
+    selectedDifficulty,
+    videos,
+    searchTerm,
+    setFilteredVideos,
+  ]);
 
   return {
     searchTerm,
