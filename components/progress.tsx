@@ -4,48 +4,17 @@ import { useEffect, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useSearchParams } from "next/navigation";
-import { ProcessedVideo } from "@/types";
+import { useVideos } from "./videos/videos-context";
 
 export function Progress() {
-  const [watchedVideos, setWatchedVideos] = useState<string[]>([]);
+  const { watchedVideos } = useVideos();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const searchParams = useSearchParams();
   const videoId = searchParams.get("id");
-  const youtubeId = searchParams.get("youtubeId");
-  const title = searchParams.get("title") || "Vídeo Educativo";
-  const description =
-    searchParams.get("description") ||
-    "Aprenda programação com este vídeo incrível!";
-  const language = searchParams.get("language") || "Geral";
-  const difficulty = searchParams.get("difficulty") || "Iniciante";
-  const duration = searchParams.get("duration") || "N/A";
-  const views = searchParams.get("views") || "0";
-  const rating = parseFloat(searchParams.get("rating") || "5.0");
-  const channelTitle = searchParams.get("channelTitle") || "Canal Educativo";
-
-  const video = {
-    id: videoId || "",
-    title,
-    description,
-    language,
-    difficulty,
-    duration,
-    views,
-    rating,
-    channelTitle,
-    youtubeId: youtubeId || "",
-    thumbnail: "",
-    publishedAt: "",
-  } as ProcessedVideo;
 
   useEffect(() => {
-    const watched = localStorage.getItem("watchedVideos");
-    if (watched) {
-      setWatchedVideos(JSON.parse(watched));
-    }
-
     const bookmarks = localStorage.getItem("bookmarkedVideos");
     if (bookmarks && videoId) {
       const bookmarkedList = JSON.parse(bookmarks);
@@ -54,24 +23,6 @@ export function Progress() {
 
     setLoading(false);
   }, [videoId]);
-
-  useEffect(() => {
-    // Mark video as watched when component mounts
-    if (videoId && !watchedVideos.includes(videoId)) {
-      const newWatchedVideos = [...watchedVideos, videoId];
-      setWatchedVideos(newWatchedVideos);
-      localStorage.setItem("watchedVideos", JSON.stringify(newWatchedVideos));
-
-      // Update user stats
-      const stats = JSON.parse(
-        localStorage.getItem("userStats") ||
-          '{"projectsCreated": 0, "videosWatched": 0, "level": 1}'
-      );
-      stats.videosWatched = newWatchedVideos.length;
-      stats.level = Math.floor(newWatchedVideos.length / 5) + 1;
-      localStorage.setItem("userStats", JSON.stringify(stats));
-    }
-  }, [videoId, watchedVideos]);
 
   return (
     <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">

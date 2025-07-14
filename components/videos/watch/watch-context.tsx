@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProcessedVideo } from "@/types";
+import { useVideos } from "../videos-context";
 
 interface WatchContextType {
   video: ProcessedVideo | null;
@@ -16,11 +17,11 @@ interface WatchContextType {
   isBookmarked: boolean;
   loading: boolean;
   setWatchedVideos: (videos: string[]) => void;
-  setIsBookmarked: (bookmarked: boolean) => void;
+  setIsBookmarked: (isBookmarked: boolean) => void;
   markVideoAsWatched: (videoId: string) => void;
 }
 
-const WatchContext = createContext<WatchContextType | null>(null);
+const WatchContext = createContext<WatchContextType | undefined>(undefined);
 
 export function useWatchContext() {
   const context = useContext(WatchContext);
@@ -36,7 +37,7 @@ interface WatchProviderProps {
 
 export function WatchProvider({ children }: WatchProviderProps) {
   const searchParams = useSearchParams();
-  const [watchedVideos, setWatchedVideos] = useState<string[]>([]);
+  const { watchedVideos, markVideoAsWatched } = useVideos();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -70,29 +71,7 @@ export function WatchProvider({ children }: WatchProviderProps) {
       }
     : null;
 
-  const markVideoAsWatched = (videoId: string) => {
-    if (!watchedVideos.includes(videoId)) {
-      const newWatchedVideos = [...watchedVideos, videoId];
-      setWatchedVideos(newWatchedVideos);
-      localStorage.setItem("watchedVideos", JSON.stringify(newWatchedVideos));
-
-      // Update user stats
-      const stats = JSON.parse(
-        localStorage.getItem("userStats") ||
-          '{"projectsCreated": 0, "videosWatched": 0, "level": 1}'
-      );
-      stats.videosWatched = newWatchedVideos.length;
-      stats.level = Math.floor(newWatchedVideos.length / 5) + 1;
-      localStorage.setItem("userStats", JSON.stringify(stats));
-    }
-  };
-
   useEffect(() => {
-    const watched = localStorage.getItem("watchedVideos");
-    if (watched) {
-      setWatchedVideos(JSON.parse(watched));
-    }
-
     const bookmarks = localStorage.getItem("bookmarkedVideos");
     if (bookmarks && videoId) {
       const bookmarkedList = JSON.parse(bookmarks);
@@ -107,7 +86,7 @@ export function WatchProvider({ children }: WatchProviderProps) {
     if (videoId && !watchedVideos.includes(videoId)) {
       markVideoAsWatched(videoId);
     }
-  }, [videoId, watchedVideos]);
+  }, [videoId, watchedVideos, markVideoAsWatched]);
 
   return (
     <WatchContext.Provider
@@ -116,7 +95,7 @@ export function WatchProvider({ children }: WatchProviderProps) {
         watchedVideos,
         isBookmarked,
         loading,
-        setWatchedVideos,
+        setWatchedVideos: () => {}, // Função vazia pois não é mais usada
         setIsBookmarked,
         markVideoAsWatched,
       }}
