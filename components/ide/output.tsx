@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Terminal } from "lucide-react";

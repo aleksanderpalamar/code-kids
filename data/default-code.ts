@@ -38,7 +38,13 @@ local frutas = {"maçã", "banana", "laranja"}
 print("Minhas frutas favoritas:")
 for i, fruta in ipairs(frutas) do
     print(i .. ". " .. fruta .. " 🍎")
-end`,
+end
+
+-- Exemplo com matemática
+local numero = math.random(1, 10)
+print("Número aleatório: " .. numero)
+
+-- Execute o código e veja a magia do Lua! ✨`,
 
   python: `# Bem-vindo ao Python! 🐍
 # Python é perfeito para iniciantes!
@@ -63,6 +69,6 @@ for i, fruta in enumerate(frutas, 1):
 import random
 
 numero_secreto = random.randint(1, 10)
-print(f"Tente adivinhar o número entre 1 e 10!")
-print(f"Dica: O número é {numero_secreto} 😉")`,
+print(f"Número gerado entre 1 e 10: {numero_secreto}")
+print("Execute o código e veja a mágica do Python! ✨")`,
 };

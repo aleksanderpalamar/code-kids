@@ -30,7 +30,13 @@ export function CodeEditor({
     <Card className="bg-white/80 backdrop-blur-sm border-purple-200">
       <CardHeader>
         <CardTitle className="flex items-center text-sm md:text-base">
-          <Image src={Code} alt="IDE online editor" width={36} height={36} className="mr-2"/>
+          <Image
+            src={Code}
+            alt="IDE online editor"
+            width={36}
+            height={36}
+            className="mr-2"
+          />
           Editor de Código
         </CardTitle>
       </CardHeader>
@@ -47,7 +53,7 @@ export function CodeEditor({
               fontSize: isMobile ? 11 : 12,
               lineNumbers: "on",
               roundedSelection: false,
-              scrollBeyondLastLine: false,
+              scrollBeyondLastLine: true,
               automaticLayout: true,
               padding: { top: 16, bottom: 16 },
               wordWrap: "on",
