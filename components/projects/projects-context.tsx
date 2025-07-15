@@ -7,15 +7,9 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { useAppStore, Project } from "@/stores/app-store";
 
-export interface Project {
-  id: string;
-  name: string;
-  language: string;
-  code: string;
-  createdAt: string;
-  lastModified: string;
-}
+export type { Project };
 
 export interface UserStats {
   projectsCreated: number;
@@ -50,7 +44,6 @@ interface ProjectsProviderProps {
 }
 
 export function ProjectsProvider({ children }: ProjectsProviderProps) {
-  const [projects, setProjects] = useState<Project[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [userStats, setUserStats] = useState<UserStats>({
@@ -59,20 +52,33 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
     level: 1,
   });
 
+  const {
+    projects,
+    deleteProject: deleteStoreProject,
+    userStats: storeUserStats,
+  } = useAppStore();
+
+  // Sincronizar userStats locais com store
+  useEffect(() => {
+    setUserStats({
+      projectsCreated: storeUserStats.projectsCreated,
+      videoWatched: storeUserStats.videosWatched,
+      level: storeUserStats.level,
+    });
+  }, [storeUserStats]);
+
   const loadProjects = () => {
-    const savedProjects = localStorage.getItem("codeProjects");
-    if (savedProjects) {
-      const parsedProjects = JSON.parse(savedProjects);
-      setProjects(parsedProjects);
-      setFilteredProjects(parsedProjects);
-    }
+    // Os projetos já vêm do store, não precisamos carregar do localStorage
+    setFilteredProjects(projects);
   };
 
   const loadUserStats = () => {
-    const stats = localStorage.getItem("userStats");
-    if (stats) {
-      setUserStats(JSON.parse(stats));
-    }
+    // As estatísticas já vêm do store
+    setUserStats({
+      projectsCreated: storeUserStats.projectsCreated,
+      videoWatched: storeUserStats.videosWatched,
+      level: storeUserStats.level,
+    });
   };
 
   const refreshProjects = () => {
@@ -81,8 +87,11 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   };
 
   const deleteProject = (projectId: string) => {
+    // Deletar projeto do store (que gerencia automaticamente a persistência)
+    deleteStoreProject(projectId);
+
+    // Atualizar projetos filtrados
     const updatedProjects = projects.filter((p) => p.id !== projectId);
-    setProjects(updatedProjects);
     setFilteredProjects(
       updatedProjects.filter(
         (project) =>
@@ -90,17 +99,12 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
           project.language.toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
-    localStorage.setItem("codeProjects", JSON.stringify(updatedProjects));
-
-    const stats = { ...userStats, projectsCreated: updatedProjects.length };
-    setUserStats(stats);
-    localStorage.setItem("userStats", JSON.stringify(stats));
   };
 
   useEffect(() => {
     loadProjects();
     loadUserStats();
-  }, []);
+  }, [projects]); // Reagir às mudanças nos projetos do store
 
   useEffect(() => {
     const filtered = projects.filter(

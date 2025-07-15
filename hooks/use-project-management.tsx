@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
 import { useEffect } from "react";
-import { useIDE, Project } from "@/components/ide/ide-context";
+import { useIDE } from "@/components/ide/ide-context";
+import { useAppStore, Project } from "@/stores/app-store";
 import { defaultCode } from "@/data/default-code";
 
 export function useProjectManagement() {
@@ -20,21 +21,25 @@ export function useProjectManagement() {
     setShowNewProject,
   } = useIDE();
 
-  // Load projects from localStorage on mount
+  const {
+    projects: storeProjects,
+    setProjects: setStoreProjects,
+    addProject: addStoreProject,
+    updateProject: updateStoreProject,
+  } = useAppStore();
+
+  // Load projects from store on mount and sync with IDE context
   useEffect(() => {
-    const savedProjects = localStorage.getItem("codeProjects");
-    if (savedProjects) {
-      const parsedProjects = JSON.parse(savedProjects);
-      setProjects(parsedProjects);
-      if (parsedProjects.length > 0) {
-        setCurrentProject(parsedProjects[0]);
-        setCode(parsedProjects[0].code);
-        setLanguage(parsedProjects[0].language);
-      }
+    // Carregar projetos do store do Zustand
+    setProjects(storeProjects);
+    if (storeProjects.length > 0) {
+      setCurrentProject(storeProjects[0]);
+      setCode(storeProjects[0].code);
+      setLanguage(storeProjects[0].language);
     } else {
       setCode(defaultCode.javascript);
     }
-  }, [setProjects, setCurrentProject, setCode, setLanguage]);
+  }, [storeProjects, setProjects, setCurrentProject, setCode, setLanguage]);
 
   const createNewProject = () => {
     if (!newProjectName.trim()) return;
@@ -48,19 +53,14 @@ export function useProjectManagement() {
       lastModified: new Date().toISOString(),
     };
 
+    // Adicionar projeto ao store (que gerencia automaticamente a persistência)
+    addStoreProject(newProject);
+
+    // Atualizar contexto IDE
     const updatedProjects = [...projects, newProject];
     setProjects(updatedProjects);
     setCurrentProject(newProject);
     setCode(newProject.code);
-    localStorage.setItem("codeProjects", JSON.stringify(updatedProjects));
-
-    // Update user stats
-    const stats = JSON.parse(
-      localStorage.getItem("userStats") ||
-        '{"projectsCreated": 0, "videosWatched": 0, "level": 1}'
-    );
-    stats.projectsCreated = updatedProjects.length;
-    localStorage.setItem("userStats", JSON.stringify(stats));
 
     setNewProjectName("");
     setShowNewProject(false);
@@ -76,13 +76,15 @@ export function useProjectManagement() {
       lastModified: new Date().toISOString(),
     };
 
+    // Atualizar projeto no store
+    updateStoreProject(updatedProject);
+
+    // Atualizar contexto IDE
     const updatedProjects = projects.map((p) =>
       p.id === currentProject.id ? updatedProject : p
     );
-
     setProjects(updatedProjects);
     setCurrentProject(updatedProject);
-    localStorage.setItem("codeProjects", JSON.stringify(updatedProjects));
 
     setOutput((prev) => prev + "\n✅ Projeto salvo com sucesso!");
   };

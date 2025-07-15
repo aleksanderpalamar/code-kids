@@ -1,9 +1,13 @@
 "use client";
 
 import { useAppStore } from "@/stores/app-store";
+import { useAppInitialization } from "@/hooks/use-app-initialization";
 
 export function UserStats() {
   const { userStats } = useAppStore();
+
+  // Inicializar e sincronizar dados
+  useAppInitialization();
   return (
     <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 md:space-x-6 mb-6 md:mb-8 px-4">
       <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 md:p-4 border border-purple-200 w-full sm:w-auto min-w-[120px]">

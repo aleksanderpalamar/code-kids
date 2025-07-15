@@ -1,15 +1,14 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
-
-export interface Project {
-  id: string;
-  name: string;
-  language: string;
-  code: string;
-  createdAt: string;
-  lastModified: string;
-}
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  ReactNode,
+} from "react";
+import { Project } from "@/stores/app-store";
 
 interface IDEContextType {
   // State
@@ -23,7 +22,7 @@ interface IDEContextType {
   newProjectName: string;
   isMobile: boolean;
   editorRef: React.MutableRefObject<any>;
-  
+
   // Actions
   setProjects: (projects: Project[]) => void;
   setCurrentProject: (project: Project | null) => void;
@@ -41,7 +40,7 @@ const IDEContext = createContext<IDEContextType | undefined>(undefined);
 export function useIDE() {
   const context = useContext(IDEContext);
   if (context === undefined) {
-    throw new Error('useIDE must be used within an IDEProvider');
+    throw new Error("useIDE must be used within an IDEProvider");
   }
   return context;
 }
@@ -74,7 +73,7 @@ export function IDEProvider({ children }: IDEProviderProps) {
     newProjectName,
     isMobile,
     editorRef,
-    
+
     // Actions
     setProjects,
     setCurrentProject,
@@ -87,9 +86,5 @@ export function IDEProvider({ children }: IDEProviderProps) {
     setIsMobile,
   };
 
-  return (
-    <IDEContext.Provider value={value}>
-      {children}
-    </IDEContext.Provider>
-  );
+  return <IDEContext.Provider value={value}>{children}</IDEContext.Provider>;
 }

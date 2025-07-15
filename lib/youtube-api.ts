@@ -4,7 +4,7 @@ import detectLanguage from "./detect-language";
 import detectDifficulty from "./detect-difficulty";
 import formatViews from "./format-views";
 import { CHANNELS } from "@/data/channels";
-import fetchWithLocalCache from "./fetch-with-localecache";
+import fetchWithZustandCache from "./fetch-with-zustand-cache";
 import { saveVideosToIndexedDB, getVideosFromIndexedDB } from "@/lib/indexeddb";
 
 export async function searchBrazilianProgrammingVideos(
@@ -30,7 +30,7 @@ export async function searchBrazilianProgrammingVideos(
 
     console.log("🔍 Buscando vídeos com ETag:", query);
 
-    const searchData = await fetchWithLocalCache(searchUrl);
+    const searchData = await fetchWithZustandCache(searchUrl);
 
     const filteredItems = searchData.items.filter((item: any) =>
       CHANNELS.some((channel) =>
@@ -51,7 +51,7 @@ export async function searchBrazilianProgrammingVideos(
       .join(",");
 
     const detailsUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${videoIds}&key=${apiKey}`;
-    const detailsData = await fetchWithLocalCache(detailsUrl);
+    const detailsData = await fetchWithZustandCache(detailsUrl);
 
     const videoDetails = new Map<string, VideoDetails>(
       detailsData.items.map((item: any) => [

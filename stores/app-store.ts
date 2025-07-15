@@ -2,10 +2,29 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ProcessedVideo } from "@/types";
 
+export interface Project {
+  id: string;
+  name: string;
+  language: string;
+  code: string;
+  createdAt: string;
+  lastModified: string;
+}
+
 interface UserStats {
   projectsCreated: number;
   videosWatched: number;
   level: number;
+}
+
+interface CacheEntry {
+  data: any;
+  timestamp: number;
+  etag?: string;
+}
+
+interface YouTubeCache {
+  [url: string]: CacheEntry;
 }
 
 interface AppState {
@@ -14,6 +33,12 @@ interface AppState {
   filteredVideos: ProcessedVideo[];
   watchedVideos: string[];
   bookmarkedVideos: string[];
+
+  // Projects state
+  projects: Project[];
+
+  // YouTube Cache state
+  youtubeCache: YouTubeCache;
 
   // UI state
   loading: boolean;
@@ -38,11 +63,25 @@ interface AppState {
   setSelectedLanguage: (language: string) => void;
   setSelectedDifficulty: (difficulty: string) => void;
 
+  // Project actions
+  setProjects: (projects: Project[]) => void;
+  addProject: (project: Project) => void;
+  updateProject: (project: Project) => void;
+  deleteProject: (projectId: string) => void;
+
+  // YouTube Cache actions
+  getCacheEntry: (url: string) => CacheEntry | null;
+  setCacheEntry: (url: string, entry: CacheEntry) => void;
+  clearExpiredCache: () => void;
+
   // Video actions
   markVideoAsWatched: (videoId: string) => void;
   toggleBookmark: (videoId: string) => void;
   isVideoWatched: (videoId: string) => boolean;
   isVideoBookmarked: (videoId: string) => boolean;
+
+  // User stats actions
+  syncUserStatsFromLocalStorage: () => void;
 
   // Reset actions
   resetFilters: () => void;
@@ -57,6 +96,8 @@ export const useAppStore = create<AppState>()(
       filteredVideos: [],
       watchedVideos: [],
       bookmarkedVideos: [],
+      projects: [],
+      youtubeCache: {},
 
       loading: true,
       searchLoading: false,
@@ -89,6 +130,81 @@ export const useAppStore = create<AppState>()(
 
       setSelectedDifficulty: (selectedDifficulty) =>
         set({ selectedDifficulty }),
+
+      // Project actions
+      setProjects: (projects) => {
+        set({ projects });
+        set((state) => ({
+          userStats: {
+            ...state.userStats,
+            projectsCreated: projects.length,
+          },
+        }));
+      },
+
+      addProject: (project) => {
+        set((state) => {
+          const newProjects = [...state.projects, project];
+          return {
+            projects: newProjects,
+            userStats: {
+              ...state.userStats,
+              projectsCreated: newProjects.length,
+            },
+          };
+        });
+      },
+
+      updateProject: (updatedProject) => {
+        set((state) => ({
+          projects: state.projects.map((p) =>
+            p.id === updatedProject.id ? updatedProject : p
+          ),
+        }));
+      },
+
+      deleteProject: (projectId) => {
+        set((state) => {
+          const newProjects = state.projects.filter((p) => p.id !== projectId);
+          return {
+            projects: newProjects,
+            userStats: {
+              ...state.userStats,
+              projectsCreated: newProjects.length,
+            },
+          };
+        });
+      },
+
+      // YouTube Cache actions
+      getCacheEntry: (url) => {
+        const { youtubeCache } = get();
+        return youtubeCache[url] || null;
+      },
+
+      setCacheEntry: (url, entry) => {
+        set((state) => ({
+          youtubeCache: {
+            ...state.youtubeCache,
+            [url]: entry,
+          },
+        }));
+      },
+
+      clearExpiredCache: () => {
+        const TTL = 1000 * 60 * 60; // 1 hora
+        const now = Date.now();
+
+        set((state) => {
+          const newCache: YouTubeCache = {};
+          Object.entries(state.youtubeCache).forEach(([url, entry]) => {
+            if (now - entry.timestamp < TTL) {
+              newCache[url] = entry;
+            }
+          });
+          return { youtubeCache: newCache };
+        });
+      },
 
       markVideoAsWatched: (videoId) => {
         const { watchedVideos } = get();
@@ -137,6 +253,95 @@ export const useAppStore = create<AppState>()(
           selectedDifficulty: "all",
         }),
 
+      syncUserStatsFromLocalStorage: () => {
+        // Migrar projetos do localStorage antigo "codeProjects" para o store
+        const savedProjects = localStorage.getItem("codeProjects");
+        if (savedProjects) {
+          try {
+            const parsedProjects = JSON.parse(savedProjects);
+            // Atualizar projetos no store
+            set((state) => ({
+              projects: parsedProjects,
+              userStats: {
+                ...state.userStats,
+                projectsCreated: parsedProjects.length,
+              },
+            }));
+
+            // Remover a chave antiga do localStorage após a migração
+            localStorage.removeItem("codeProjects");
+          } catch (error) {
+            console.error("Erro ao migrar projetos:", error);
+          }
+        }
+
+        // Migrar cache do YouTube do localStorage antigo para o store
+        const migratedCache: YouTubeCache = {};
+        const keysToRemove: string[] = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key?.startsWith("yt:cache:")) {
+            const url = key.replace("yt:cache:", "");
+            const cacheData = localStorage.getItem(key);
+            const timestampKey = `yt:timestamp${url}`;
+            const etagKey = `yt:etag:${url}`;
+
+            const timestamp = localStorage.getItem(timestampKey);
+            const etag = localStorage.getItem(etagKey);
+
+            if (cacheData && timestamp) {
+              try {
+                migratedCache[url] = {
+                  data: JSON.parse(cacheData),
+                  timestamp: parseInt(timestamp),
+                  etag: etag || undefined,
+                };
+
+                // Marcar para remoção
+                keysToRemove.push(key, timestampKey, etagKey);
+              } catch (error) {
+                console.warn("Erro ao migrar cache:", key, error);
+                keysToRemove.push(key, timestampKey, etagKey);
+              }
+            }
+          }
+        }
+
+        // Atualizar cache no store se houver dados migrados
+        if (Object.keys(migratedCache).length > 0) {
+          set((state) => ({
+            youtubeCache: { ...state.youtubeCache, ...migratedCache },
+          }));
+        }
+
+        // Remover chaves antigas do localStorage
+        keysToRemove.forEach((key) => {
+          if (key) localStorage.removeItem(key);
+        });
+
+        // Sincronizar outras estatísticas do localStorage "userStats"
+        const savedStats = localStorage.getItem("userStats");
+        if (savedStats) {
+          try {
+            const stats = JSON.parse(savedStats);
+            set((state) => ({
+              userStats: {
+                ...state.userStats,
+                videosWatched:
+                  stats.videosWatched || state.userStats.videosWatched,
+                level: stats.level || state.userStats.level,
+              },
+            }));
+
+            // Remover userStats antigo do localStorage
+            localStorage.removeItem("userStats");
+          } catch (error) {
+            console.error("Erro ao migrar estatísticas:", error);
+          }
+        }
+      },
+
       clearError: () => set({ error: null }),
     }),
     {
@@ -145,6 +350,8 @@ export const useAppStore = create<AppState>()(
         watchedVideos: state.watchedVideos,
         bookmarkedVideos: state.bookmarkedVideos,
         userStats: state.userStats,
+        projects: state.projects, // Agora os projetos são persistidos aqui
+        youtubeCache: state.youtubeCache, // Cache do YouTube também persistido aqui
       }), // apenas persiste dados importantes
     }
   )
