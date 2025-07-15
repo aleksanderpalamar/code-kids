@@ -7,9 +7,21 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { useSearchParams } from "next/navigation";
 import { ProcessedVideo } from "@/types";
 import { useAppStore } from "@/stores/app-store";
+
+interface VideoData {
+  videoId: string | null;
+  youtubeId: string | null;
+  title: string;
+  description: string;
+  language: string;
+  difficulty: string;
+  duration: string;
+  views: string;
+  rating: number;
+  channelTitle: string;
+}
 
 interface WatchContextType {
   video: ProcessedVideo | null;
@@ -33,10 +45,10 @@ export function useWatchContext() {
 
 interface WatchProviderProps {
   children: ReactNode;
+  videoData: VideoData;
 }
 
-export function WatchProvider({ children }: WatchProviderProps) {
-  const searchParams = useSearchParams();
+export function WatchProvider({ children, videoData }: WatchProviderProps) {
   const {
     watchedVideos,
     markVideoAsWatched,
@@ -45,18 +57,18 @@ export function WatchProvider({ children }: WatchProviderProps) {
   } = useAppStore();
   const [loading, setLoading] = useState(true);
 
-  const videoId = searchParams.get("id");
-  const youtubeId = searchParams.get("youtubeId");
-  const title = searchParams.get("title") || "Vídeo Educativo";
-  const description =
-    searchParams.get("description") ||
-    "Aprenda programação com este vídeo incrível!";
-  const language = searchParams.get("language") || "Geral";
-  const difficulty = searchParams.get("difficulty") || "Iniciante";
-  const duration = searchParams.get("duration") || "N/A";
-  const views = searchParams.get("views") || "0";
-  const rating = parseFloat(searchParams.get("rating") || "5.0");
-  const channelTitle = searchParams.get("channelTitle") || "Canal Educativo";
+  const {
+    videoId,
+    youtubeId,
+    title,
+    description,
+    language,
+    difficulty,
+    duration,
+    views,
+    rating,
+    channelTitle,
+  } = videoData;
 
   const video: ProcessedVideo | null = videoId
     ? {

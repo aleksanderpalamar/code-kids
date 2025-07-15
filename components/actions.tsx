@@ -1,17 +1,17 @@
 import { ExternalLink, ThumbsUp } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { ProcessedVideo } from "@/lib/youtube-api";
 import { useSearchParams } from "next/navigation";
+import { ProcessedVideo } from "@/types";
 
 export function Actions() {
-    const searchParams = useSearchParams();
-    const youtubeId = searchParams.get("youtubeId");
-    const video = {
-        youtubeId: youtubeId || "",
-        thumbnail: "",
-        publishedAt: "",
-      } as ProcessedVideo;
+  const searchParams = useSearchParams();
+  const youtubeId = searchParams.get("youtubeId");
+  const video = {
+    youtubeId: youtubeId || "",
+    thumbnail: "",
+    publishedAt: "",
+  } as ProcessedVideo;
   return (
     <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
       <CardHeader>
