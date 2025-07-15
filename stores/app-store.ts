@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { ProcessedVideo } from "@/types";
+import { calculateUserLevel, calculateTotalPoints } from "@/lib/level-system";
 
 export interface Project {
   id: string;
@@ -133,23 +134,35 @@ export const useAppStore = create<AppState>()(
 
       // Project actions
       setProjects: (projects) => {
-        set({ projects });
-        set((state) => ({
+        const newUserLevel = calculateUserLevel(
+          get().userStats.videosWatched,
+          projects.length
+        );
+
+        set({
+          projects,
           userStats: {
-            ...state.userStats,
+            ...get().userStats,
             projectsCreated: projects.length,
+            level: newUserLevel.currentLevel,
           },
-        }));
+        });
       },
 
       addProject: (project) => {
         set((state) => {
           const newProjects = [...state.projects, project];
+          const newUserLevel = calculateUserLevel(
+            state.userStats.videosWatched,
+            newProjects.length
+          );
+
           return {
             projects: newProjects,
             userStats: {
               ...state.userStats,
               projectsCreated: newProjects.length,
+              level: newUserLevel.currentLevel,
             },
           };
         });
@@ -166,11 +179,17 @@ export const useAppStore = create<AppState>()(
       deleteProject: (projectId) => {
         set((state) => {
           const newProjects = state.projects.filter((p) => p.id !== projectId);
+          const newUserLevel = calculateUserLevel(
+            state.userStats.videosWatched,
+            newProjects.length
+          );
+
           return {
             projects: newProjects,
             userStats: {
               ...state.userStats,
               projectsCreated: newProjects.length,
+              level: newUserLevel.currentLevel,
             },
           };
         });
@@ -210,15 +229,20 @@ export const useAppStore = create<AppState>()(
         const { watchedVideos } = get();
         if (!watchedVideos.includes(videoId)) {
           const newWatchedVideos = [...watchedVideos, videoId];
-          const newUserStats = {
-            ...get().userStats,
-            videosWatched: newWatchedVideos.length,
-            level: Math.floor(newWatchedVideos.length / 5) + 1,
-          };
+
+          // Calcular novo nível usando o sistema de pontuação
+          const newUserLevel = calculateUserLevel(
+            newWatchedVideos.length,
+            get().userStats.projectsCreated
+          );
 
           set({
             watchedVideos: newWatchedVideos,
-            userStats: newUserStats,
+            userStats: {
+              ...get().userStats,
+              videosWatched: newWatchedVideos.length,
+              level: newUserLevel.currentLevel,
+            },
           });
         }
       },

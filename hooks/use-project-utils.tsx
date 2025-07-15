@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import Image from "next/image";
+import { getLevelConfig } from "@/lib/level-system";
 
 import Javascript from "@/public/assests/javascript.png";
 import Python from "@/public/assests/python.png";
 import Lua from "@/public/assests/lua.png";
 import Code from "@/public/assests/code-icon.png";
-import Stars from "@/public/assests/stars.png";
 import DevPleno from "@/public/assests/dev-pleno.png";
 import DevJr from "@/public/assests/dev-jr.png";
 import DevSenior from "@/public/assests/dev-senior.png";
@@ -50,22 +50,29 @@ export function useProjectUtils() {
   };
 
   const getLevelBadge = (level: number) => {
-    if (level >= 20)
-      return {
-        emoji: <Image src={DevSenior} alt="DevSenior" width={32} height={32} />,
-        title: "Sênior",
-        color: "bg-yellow-100 text-yellow-800",
-      };
-    if (level >= 10)
-      return {
-        emoji: <Image src={DevPleno} alt="DevPleno" width={32} height={32} />,
-        title: "Pleno",
-        color: "bg-blue-100 text-blue-800",
-      };
+    const config = getLevelConfig(level);
+
+    // Mapeamento de imagens baseado no título do nível (apenas 3 níveis)
+    const getImageForLevel = (title: string) => {
+      switch (title) {
+        case "Junior":
+          return <Image src={DevJr} alt="DevJr" width={32} height={32} />;
+        case "Pleno":
+          return <Image src={DevPleno} alt="DevPleno" width={32} height={32} />;
+        case "Sênior":
+          return (
+            <Image src={DevSenior} alt="DevSenior" width={32} height={32} />
+          );
+        default:
+          return <Image src={DevJr} alt="DevJr" width={32} height={32} />;
+      }
+    };
+
     return {
-      emoji: <Image src={DevJr} alt="DevJr" width={32} height={32} />,
-      title: "Junior",
-      color: "bg-emerald-100 text-emerald-800",
+      emoji: getImageForLevel(config.title),
+      title: config.title,
+      color: config.color,
+      description: config.description,
     };
   };
 

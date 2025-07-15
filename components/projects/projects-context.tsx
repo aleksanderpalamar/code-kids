@@ -13,7 +13,7 @@ export type { Project };
 
 export interface UserStats {
   projectsCreated: number;
-  videoWatched: number;
+  videosWatched: number; // Corrigido para manter consistência
   level: number;
 }
 
@@ -48,7 +48,7 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [userStats, setUserStats] = useState<UserStats>({
     projectsCreated: 0,
-    videoWatched: 0,
+    videosWatched: 0,
     level: 1,
   });
 
@@ -62,7 +62,7 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   useEffect(() => {
     setUserStats({
       projectsCreated: storeUserStats.projectsCreated,
-      videoWatched: storeUserStats.videosWatched,
+      videosWatched: storeUserStats.videosWatched,
       level: storeUserStats.level,
     });
   }, [storeUserStats]);
@@ -76,7 +76,7 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
     // As estatísticas já vêm do store
     setUserStats({
       projectsCreated: storeUserStats.projectsCreated,
-      videoWatched: storeUserStats.videosWatched,
+      videosWatched: storeUserStats.videosWatched,
       level: storeUserStats.level,
     });
   };

@@ -32,7 +32,7 @@ export function StatsCards({ userStats }: StatsCardsProps) {
       <Card className="bg-gradient-to-r from-purple-500 to-violet-500 text-white border-0">
         <CardContent className="p-4 md:p-6 text-center">
           <div className="text-2xl md:text-3xl font-bold mb-2">
-            {userStats.videoWatched}
+            {userStats.videosWatched}
           </div>
           <div className="text-blue-100 text-sm md:text-base">
             Vídeos Assistidos
