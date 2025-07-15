@@ -25,18 +25,18 @@ export function useVideoUtils() {
     switch (language) {
       case "JavaScript":
         return (
-          <Image src={Javascript} alt="Javascript" width={24} height={24} />
+          <Image src={Javascript} alt="Javascript" width={18} height={18} />
         );
       case "Python":
-        return <Image src={Python} alt="Python" width={24} height={24} />;
+        return <Image src={Python} alt="Python" width={18} height={18} />;
       case "Lua":
-        return <Image src={Lua} alt="Lua" width={24} height={24} />;
+        return <Image src={Lua} alt="Lua" width={18} height={18} />;
       case "HTML/CSS":
-        return <Image src={Html} alt="Html" width={24} height={24} />;
+        return <Image src={Html} alt="Html" width={18} height={18} />;
       case "Geral":
         return <Image src={Code} alt="Code" width={18} height={18} />;
       default:
-        return "💻";
+        return <Image src={Code} alt="Code" width={18} height={18} />;
     }
   };
 
