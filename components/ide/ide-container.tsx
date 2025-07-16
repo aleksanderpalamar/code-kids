@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import { Controls } from "./controls";
 import { CodeEditor } from "./code-editor";
 import { Output } from "./output";
+import { Toast } from "@/components/ui/toast";
 import { useIDE } from "./ide-context";
 import { useProjectManagement } from "@/hooks/use-project-management";
 import { useCodeExecution } from "@/hooks/use-code-execution";
@@ -31,7 +32,7 @@ export function IDEContainer() {
   // Initialize hooks
   useMobileDetection();
   const { createNewProject, saveProject, loadProject } = useProjectManagement();
-  const { runCode } = useCodeExecution();
+  const { runCode, toast, hideToast } = useCodeExecution();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100">
@@ -78,6 +79,14 @@ export function IDEContainer() {
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      <Toast
+        isVisible={toast.isVisible}
+        message={toast.message}
+        type={toast.type}
+        onCloseAction={hideToast}
+      />
     </div>
   );
 }

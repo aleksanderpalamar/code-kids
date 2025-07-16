@@ -15,6 +15,7 @@ export interface Project {
 interface UserStats {
   projectsCreated: number;
   videosWatched: number;
+  projectsExecuted: number;
   level: number;
 }
 
@@ -81,6 +82,9 @@ interface AppState {
   isVideoWatched: (videoId: string) => boolean;
   isVideoBookmarked: (videoId: string) => boolean;
 
+  // Project execution actions
+  recordSuccessfulExecution: () => void;
+
   // User stats actions
   syncUserStatsFromLocalStorage: () => void;
 
@@ -111,6 +115,7 @@ export const useAppStore = create<AppState>()(
       userStats: {
         projectsCreated: 0,
         videosWatched: 0,
+        projectsExecuted: 0,
         level: 1,
       },
 
@@ -136,7 +141,8 @@ export const useAppStore = create<AppState>()(
       setProjects: (projects) => {
         const newUserLevel = calculateUserLevel(
           get().userStats.videosWatched,
-          projects.length
+          projects.length,
+          get().userStats.projectsExecuted
         );
 
         set({
@@ -154,7 +160,8 @@ export const useAppStore = create<AppState>()(
           const newProjects = [...state.projects, project];
           const newUserLevel = calculateUserLevel(
             state.userStats.videosWatched,
-            newProjects.length
+            newProjects.length,
+            state.userStats.projectsExecuted
           );
 
           return {
@@ -181,7 +188,8 @@ export const useAppStore = create<AppState>()(
           const newProjects = state.projects.filter((p) => p.id !== projectId);
           const newUserLevel = calculateUserLevel(
             state.userStats.videosWatched,
-            newProjects.length
+            newProjects.length,
+            state.userStats.projectsExecuted
           );
 
           return {
@@ -233,7 +241,8 @@ export const useAppStore = create<AppState>()(
           // Calcular novo nível usando o sistema de pontuação
           const newUserLevel = calculateUserLevel(
             newWatchedVideos.length,
-            get().userStats.projectsCreated
+            get().userStats.projectsCreated,
+            get().userStats.projectsExecuted
           );
 
           set({
@@ -268,6 +277,33 @@ export const useAppStore = create<AppState>()(
 
       isVideoBookmarked: (videoId) => {
         return get().bookmarkedVideos.includes(videoId);
+      },
+
+      // Registrar execução bem-sucedida de código
+      recordSuccessfulExecution: () => {
+        console.log("🔍 recordSuccessfulExecution chamado");
+        set((state) => {
+          console.log("🔍 Estado anterior:", state.userStats);
+          const newExecutionCount = state.userStats.projectsExecuted + 1;
+
+          // Calcular novo nível
+          const newUserLevel = calculateUserLevel(
+            state.userStats.videosWatched,
+            state.userStats.projectsCreated,
+            newExecutionCount
+          );
+
+          const newState = {
+            userStats: {
+              ...state.userStats,
+              projectsExecuted: newExecutionCount,
+              level: newUserLevel.currentLevel,
+            },
+          };
+
+          console.log("🔍 Novo estado:", newState.userStats);
+          return newState;
+        });
       },
 
       resetFilters: () =>

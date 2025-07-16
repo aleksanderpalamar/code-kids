@@ -33,6 +33,7 @@ export interface UseLevelSystemReturn {
     message?: string;
   };
   handleProjectCreated: () => { leveledUp: boolean; message?: string };
+  handleSuccessfulExecution: () => { leveledUp: boolean; message?: string };
 
   // Utilitários
   getPointsForAction: (action: keyof typeof POINTS_SYSTEM) => number;
@@ -40,23 +41,38 @@ export interface UseLevelSystemReturn {
 }
 
 export function useLevelSystem(): UseLevelSystemReturn {
-  const { userStats, markVideoAsWatched, addProject, watchedVideos } =
-    useAppStore();
+  const {
+    userStats,
+    markVideoAsWatched,
+    addProject,
+    recordSuccessfulExecution,
+    watchedVideos,
+  } = useAppStore();
 
   // Calcular informações do nível atual
   const userLevel = useMemo(() => {
     return calculateUserLevel(
       userStats.videosWatched,
-      userStats.projectsCreated
+      userStats.projectsCreated,
+      userStats.projectsExecuted || 0
     );
-  }, [userStats.videosWatched, userStats.projectsCreated]);
+  }, [
+    userStats.videosWatched,
+    userStats.projectsCreated,
+    userStats.projectsExecuted,
+  ]);
 
   const totalPoints = useMemo(() => {
     return calculateTotalPoints(
       userStats.videosWatched,
-      userStats.projectsCreated
+      userStats.projectsCreated,
+      userStats.projectsExecuted || 0
     );
-  }, [userStats.videosWatched, userStats.projectsCreated]);
+  }, [
+    userStats.videosWatched,
+    userStats.projectsCreated,
+    userStats.projectsExecuted,
+  ]);
 
   const levelConfig = useMemo(() => {
     return getLevelConfig(userLevel.currentLevel);
@@ -110,6 +126,38 @@ export function useLevelSystem(): UseLevelSystemReturn {
     return { leveledUp: false };
   }, [totalPoints]);
 
+  // Função para lidar com execução bem-sucedida com verificação de level up
+  const handleSuccessfulExecution = useCallback(() => {
+    console.log(
+      "🔍 handleSuccessfulExecution iniciado - pontos atuais:",
+      totalPoints
+    );
+
+    const previousPoints = totalPoints;
+    const newPoints = previousPoints + POINTS_SYSTEM.PROJECT_EXECUTED;
+    const levelCheck = checkLevelUp(previousPoints, newPoints);
+
+    console.log("🔍 Pontos anteriores:", previousPoints);
+    console.log("🔍 Novos pontos:", newPoints);
+    console.log("🔍 Level check:", levelCheck);
+
+    // Registrar a execução no store
+    recordSuccessfulExecution();
+
+    if (levelCheck.leveledUp) {
+      const result = {
+        leveledUp: true,
+        message: getLevelUpMessage(levelCheck.newLevel),
+      };
+      console.log("🔍 Level up detectado:", result);
+      return result;
+    }
+
+    const result = { leveledUp: false };
+    console.log("🔍 Sem level up:", result);
+    return result;
+  }, [totalPoints, recordSuccessfulExecution]);
+
   // Função utilitária para obter pontos de uma ação
   const getPointsForAction = useCallback(
     (action: keyof typeof POINTS_SYSTEM) => {
@@ -128,6 +176,7 @@ export function useLevelSystem(): UseLevelSystemReturn {
     pointsToNextLevel: userLevel.pointsToNextLevel,
     handleVideoWatched,
     handleProjectCreated,
+    handleSuccessfulExecution,
     getPointsForAction,
     isMaxLevel,
   };

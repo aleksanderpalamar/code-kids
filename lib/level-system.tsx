@@ -50,8 +50,9 @@ export const LEVEL_CONFIGS: LevelConfig[] = [
 ];
 
 export const POINTS_SYSTEM = {
-  VIDEO_WATCHED: 2,
+  VIDEO_WATCHED: 1, // Corrigido para 1 ponto conforme solicitado
   PROJECT_CREATED: 5,
+  PROJECT_EXECUTED: 10, // Novo: pontos por execução bem-sucedida
   PROJECT_COMPLETED: 3, // Para futuras implementações
   CHALLENGE_COMPLETED: 8, // Para futuras implementações
 } as const;
@@ -62,12 +63,14 @@ export const POINTS_SYSTEM = {
 export function calculateTotalPoints(
   videosWatched: number,
   projectsCreated: number,
+  projectsExecuted: number = 0,
   projectsCompleted: number = 0,
   challengesCompleted: number = 0
 ): number {
   return (
     videosWatched * POINTS_SYSTEM.VIDEO_WATCHED +
     projectsCreated * POINTS_SYSTEM.PROJECT_CREATED +
+    projectsExecuted * POINTS_SYSTEM.PROJECT_EXECUTED +
     projectsCompleted * POINTS_SYSTEM.PROJECT_COMPLETED +
     challengesCompleted * POINTS_SYSTEM.CHALLENGE_COMPLETED
   );
@@ -91,12 +94,14 @@ export function getLevelConfig(level: number): LevelConfig {
 export function calculateUserLevel(
   videosWatched: number,
   projectsCreated: number,
+  projectsExecuted: number = 0,
   projectsCompleted: number = 0,
   challengesCompleted: number = 0
 ): UserLevel {
   const currentPoints = calculateTotalPoints(
     videosWatched,
     projectsCreated,
+    projectsExecuted,
     projectsCompleted,
     challengesCompleted
   );

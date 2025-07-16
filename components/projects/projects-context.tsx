@@ -14,6 +14,7 @@ export type { Project };
 export interface UserStats {
   projectsCreated: number;
   videosWatched: number; // Corrigido para manter consistência
+  projectsExecuted: number;
   level: number;
 }
 
@@ -49,6 +50,7 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
   const [userStats, setUserStats] = useState<UserStats>({
     projectsCreated: 0,
     videosWatched: 0,
+    projectsExecuted: 0,
     level: 1,
   });
 
@@ -63,6 +65,7 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
     setUserStats({
       projectsCreated: storeUserStats.projectsCreated,
       videosWatched: storeUserStats.videosWatched,
+      projectsExecuted: storeUserStats.projectsExecuted || 0,
       level: storeUserStats.level,
     });
   }, [storeUserStats]);
@@ -77,6 +80,7 @@ export function ProjectsProvider({ children }: ProjectsProviderProps) {
     setUserStats({
       projectsCreated: storeUserStats.projectsCreated,
       videosWatched: storeUserStats.videosWatched,
+      projectsExecuted: storeUserStats.projectsExecuted || 0,
       level: storeUserStats.level,
     });
   };
