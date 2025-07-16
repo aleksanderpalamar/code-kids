@@ -7,13 +7,10 @@ import { videoActions } from "./video-actions";
 import { youtubeCacheActions } from "./youtube-cache-actions";
 import { userStatsActions } from "./user-stats-actions";
 import { uiActions } from "./ui-actions";
-import { migrationActions } from "./migration-actions";
 
-// Re-export types for backward compatibility
 export type { Project, UserStats, CacheEntry, YouTubeCache } from "./types";
 
 interface AppState {
-  // State
   videos: ProcessedVideo[];
   filteredVideos: ProcessedVideo[];
   watchedVideos: string[];
@@ -57,7 +54,6 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      // Initial state
       videos: [],
       filteredVideos: [],
       watchedVideos: [],
@@ -77,13 +73,12 @@ export const useAppStore = create<AppState>()(
         level: 1,
       },
 
-      // Actions from separated modules
       ...uiActions(set),
       ...videoActions(set, get),
       ...projectActions(set, get),
       ...youtubeCacheActions(set, get),
       ...userStatsActions(set, get),
-      ...migrationActions(set, get),
+      syncUserStatsFromLocalStorage: () => {},
     }),
     {
       name: "code-kids-storage",

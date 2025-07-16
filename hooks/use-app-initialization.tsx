@@ -7,7 +7,6 @@ export function useAppInitialization() {
   const { syncUserStatsFromLocalStorage } = useAppStore();
 
   useEffect(() => {
-    // Sincronizar estatísticas do localStorage na inicialização
     syncUserStatsFromLocalStorage();
   }, [syncUserStatsFromLocalStorage]);
 }

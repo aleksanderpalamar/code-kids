@@ -2,10 +2,7 @@
 
 import { useEffect, useCallback } from "react";
 import { useAppStore } from "@/stores/app-store";
-import {
-  searchBrazilianProgrammingVideos,
-  searchProgrammingVideos,
-} from "@/lib/youtube-api";
+import { searchBrazilianProgrammingVideos } from "@/lib/youtube-api";
 
 export function useVideoData() {
   const {
@@ -22,9 +19,7 @@ export function useVideoData() {
       setLoading(true);
       setError(null);
 
-      const initialVideos = await searchBrazilianProgrammingVideos(
-        "tutorial programação iniciantes"
-      );
+      const initialVideos = await searchBrazilianProgrammingVideos();
 
       // Verificar se o vídeo retornado é um indicador de erro de cota
       if (
@@ -66,9 +61,7 @@ export function useVideoData() {
         setError(null);
 
         console.log("🎯 useVideoData: Fazendo chamada para API");
-        const initialVideos = await searchBrazilianProgrammingVideos(
-          "tutorial programação iniciantes"
-        );
+        const initialVideos = await searchBrazilianProgrammingVideos();
         console.log("🎯 useVideoData: Recebeu", initialVideos.length, "vídeos");
 
         // Verificar se o vídeo retornado é um indicador de erro de cota
