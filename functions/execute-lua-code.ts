@@ -33,7 +33,7 @@ export async function executeLuaCode({
       if (levelUpResult.leveledUp) {
         showLevelUpToast(levelUpResult.message!);
       } else {
-        showSuccessToast("Código executado com sucesso! (+10 pontos)");
+        showSuccessToast("Código executado com sucesso!");
       }
 
       setOutput((prev) => prev + formattedOutput);

@@ -72,7 +72,6 @@ export function IDEContainer() {
                   editorRef={editorRef}
                   onCodeChange={setCode}
                 />
-
                 <Output output={output} />
               </div>
             </div>

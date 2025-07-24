@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useRef, useState, ReactNode } from "react";
 import { Project } from "@/stores/app-store";
 
 interface IDEContextType {

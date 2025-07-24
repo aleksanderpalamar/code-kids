@@ -1,48 +1,31 @@
-import { ReactNode } from "react";
 import Image from "next/image";
 
 import DevJr from "@/public/assests/dev-jr.png";
 import DevPleno from "@/public/assests/dev-pleno.png";
 import DevSenior from "@/public/assests/dev-senior.png";
-
-export interface LevelConfig {
-  minPoints: number;
-  maxPoints: number;
-  title: string;
-  emoji: ReactNode;
-  color: string;
-  description: string;
-}
-
-export interface UserLevel {
-  currentLevel: number;
-  currentPoints: number;
-  pointsToNextLevel: number;
-  progressPercentage: number;
-  levelConfig: LevelConfig;
-}
+import { LevelConfig, UserLevel } from "@/types";
 
 export const LEVEL_CONFIGS: LevelConfig[] = [
   {
     minPoints: 0,
-    maxPoints: 49,
-    title: "Junior",
+    maxPoints: 50,
+    title: "Iniciante",
     emoji: <Image src={DevJr} alt="DevJr" width={32} height={32} />,
     color: "bg-emerald-100 text-emerald-800",
     description: "Aprendendo os fundamentos",
   },
   {
-    minPoints: 50,
-    maxPoints: 99,
-    title: "Pleno",
+    minPoints: 51,
+    maxPoints: 100,
+    title: "Intermediario",
     emoji: <Image src={DevPleno} alt="DevPleno" width={32} height={32} />,
     color: "bg-purple-100 text-purple-800",
     description: "Dominando conceitos avançados",
   },
   {
-    minPoints: 100,
+    minPoints: 101,
     maxPoints: Number.MAX_SAFE_INTEGER,
-    title: "Sênior",
+    title: "Avançado",
     emoji: <Image src={DevSenior} alt="DevSenior" width={32} height={32} />,
     color: "bg-yellow-100 text-yellow-800",
     description: "Expert em programação",
@@ -50,16 +33,13 @@ export const LEVEL_CONFIGS: LevelConfig[] = [
 ];
 
 export const POINTS_SYSTEM = {
-  VIDEO_WATCHED: 1, // Corrigido para 1 ponto conforme solicitado
-  PROJECT_CREATED: 5,
-  PROJECT_EXECUTED: 10, // Novo: pontos por execução bem-sucedida
-  PROJECT_COMPLETED: 3, // Para futuras implementações
-  CHALLENGE_COMPLETED: 8, // Para futuras implementações
+  VIDEO_WATCHED: 1,
+  PROJECT_CREATED: 2,
+  PROJECT_EXECUTED: 3,
+  PROJECT_COMPLETED: 5,
+  CHALLENGE_COMPLETED: 10,
 } as const;
 
-/**
- * Calcula os pontos totais do usuário baseado nas atividades
- */
 export function calculateTotalPoints(
   videosWatched: number,
   projectsCreated: number,
@@ -80,7 +60,7 @@ export function getLevelFromPoints(points: number): number {
   for (let i = 0; i < LEVEL_CONFIGS.length; i++) {
     const config = LEVEL_CONFIGS[i];
     if (points >= config.minPoints && points <= config.maxPoints) {
-      return i + 1; // Níveis começam em 1, não em 0
+      return i + 1; // Níveis começam em 1.
     }
   }
   return LEVEL_CONFIGS.length; // Nível máximo se exceder todos os ranges

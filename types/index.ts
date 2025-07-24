@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface ProcessedVideo {
   id: string;
   title: string;
@@ -16,4 +18,21 @@ export interface ProcessedVideo {
 export interface VideoDetails {
   duration: string;
   views: string;
+}
+
+export interface LevelConfig {
+  minPoints: number;
+  maxPoints: number;
+  title: string;
+  emoji: ReactNode;
+  color: string;
+  description: string;
+}
+
+export interface UserLevel {
+  currentLevel: number;
+  currentPoints: number;
+  pointsToNextLevel: number;
+  progressPercentage: number;
+  levelConfig: LevelConfig;
 }
