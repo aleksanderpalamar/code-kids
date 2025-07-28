@@ -9,7 +9,7 @@ interface ExecutePythonRequest {
 }
 
 export class PythonExecutionService {
-  private static readonly API_ENDPOINT = "/api/execute-python";
+  private static readonly API_ENDPOINT = "/api/v1/execute-python";
   private static readonly TIMEOUT_MS = 10000; // 10 segundos
 
   /**

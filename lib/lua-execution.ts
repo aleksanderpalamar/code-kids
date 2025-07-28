@@ -9,7 +9,7 @@ interface ExecuteLuaRequest {
 }
 
 export class LuaExecutionService {
-  private static readonly API_ENDPOINT = "/api/execute-lua";
+  private static readonly API_ENDPOINT = "/api/v1/execute-lua";
   private static readonly TIMEOUT_MS = 10000; // 10 segundos
 
   /**
