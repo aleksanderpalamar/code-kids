@@ -8,10 +8,9 @@ import {
   checkLevelUp,
   getLevelUpMessage,
   getLevelConfig,
-  UserLevel,
-  LevelConfig,
   POINTS_SYSTEM,
 } from "@/lib/level-system";
+import { LevelConfig, UserLevel } from "@/types";
 
 export interface UseLevelSystemReturn {
   // Informações do nível atual
