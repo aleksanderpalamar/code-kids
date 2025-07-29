@@ -20,7 +20,7 @@
 
 # production
 /build
-/docs
+/GEMINI.md
 
 # misc
 .DS_Store
